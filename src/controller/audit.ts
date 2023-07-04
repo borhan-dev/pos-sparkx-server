@@ -13,14 +13,14 @@ export const getAudit: ControllerFn = async (req, res, next) => {
     }
     const productRepository = appDataSource.getRepository(Product);
     if (!supplierName && !productGroup) {
-      const products = productRepository
+      const products = await productRepository
         .createQueryBuilder("product")
         .where("product.showroomName=:showroomName", { showroomName })
         .andWhere('product.sellingStatus="Unsold"')
         .getMany();
       res.status(200).json(products);
     } else if (supplierName && productGroup) {
-      const products = productRepository
+      const products = await productRepository
         .createQueryBuilder("product")
         .where("product.showroomName=:showroomName", { showroomName })
         .andWhere("product.supplierName=:supplierName", { supplierName })
@@ -29,7 +29,7 @@ export const getAudit: ControllerFn = async (req, res, next) => {
         .getMany();
       res.status(200).json(products);
     } else if (productGroup) {
-      const products = productRepository
+      const products = await productRepository
         .createQueryBuilder("product")
         .where("product.showroomName=:showroomName", { showroomName })
         .andWhere("product.productGroup=:productGroup", { productGroup })
@@ -37,7 +37,7 @@ export const getAudit: ControllerFn = async (req, res, next) => {
         .getMany();
       res.status(200).json(products);
     } else if (supplierName) {
-      const products = productRepository
+      const products = await productRepository
         .createQueryBuilder("product")
         .where("product.showroomName=:showroomName", { showroomName })
         .andWhere("product.supplierName=:supplierName", { supplierName })

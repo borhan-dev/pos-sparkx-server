@@ -654,24 +654,26 @@ export const getProductByShowroom: ControllerFn = async (req, res, next) => {
     const showroom = await appDataSource
       .getRepository(Showroom)
       .createQueryBuilder("sr")
-      .where("sr.showroomCode=:showroomCode", { showroomCode })
-      .getOne();
+      .select("sr.showroomName", "showroomName")
+      .where("sr.showroomCode = :showroomCode", { showroomCode })
+      .getRawOne();
 
     if (!showroom) {
-      return next(new ErrorHandler("Showroom Not Found", 404));
+      throw new ErrorHandler("Showroom Not Found", 404);
     }
 
     const products = await appDataSource
       .getRepository(Product)
       .createQueryBuilder("p")
-      .where("p.showroomName=:showroomName", {
+      .select("p.id, p.itemCode, p.productGroup") // Select only necessary fields
+      .where("p.showroomName = :showroomName", {
         showroomName: showroom.showroomName,
       })
-      .andWhere('p.sellingStatus="Unsold"')
-      .getMany();
+      .andWhere('p.sellingStatus = "Unsold"')
+      .getRawMany();
 
     res.status(200).json(products);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
